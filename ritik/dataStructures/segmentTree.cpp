@@ -62,69 +62,83 @@ int T = 1;
     #define debug
 #endif
 
-class FenwickTree {
-    public:
-    vector<int> bit;
-    int n;
 
-    FenwickTree(vector<int> &a) {
-        n=a.size();
-        bit=vector<int>(n);
-        for(int i=0; i<a.size(); i++) {
-            add(i, a[i]);
+class SegmentTree {
+    public:
+    int n;
+    vector<int> seg;
+    SegmentTree(int siz) {
+        n=4*siz;
+        seg=vector<int>(n);
+    }
+    SegmentTree(vector<int> &v) {
+        n=(int)v.size();
+        seg=vector<int>(4*n);
+        build(v,1,0,n-1);
+    }
+    void build(vector<int> &v, int node, int start, int end){
+        if(start == end) { // Leaf node will have a single element
+            seg[node] = v[start];
+        }
+        else{
+            int mid = (start + end) / 2;
+            build(v, 2*node, start, mid); // Recurse on the left child
+            build(v, 2*node+1, mid+1, end); // Recurse on the right child
+            seg[node] = min(seg[2*node] , seg[2*node+1]); // Internal node will have the sum of both of its children
         }
     }
-    int sum(int r) {
-        int res=0;
-        while(r>=0) {
-            res+=bit[r];
-            r=(r&(r+1))-1;
-        } 
-        return res;
-    }
-    int sum(int l, int r){
-        return(sum(r)-sum(l-1));
-    }
-    void add(int r, int delta) {
-        while(r<n) {
-            bit[r]+=delta;
-            r=r|(r+1);
+    void update(int node, int start, int end, int idx, int val){
+        if(start == end){ // Leaf node
+            seg[node] += val;
         }
+        else {
+            int mid = (start + end) / 2;
+            if(start <= idx and idx <= mid) { // If idx is in the left child, recurse on the left child
+                update(2*node, start, mid, idx, val);
+            }
+            else { // if idx is in the right child, recurse on the right child
+                update(2*node+1, mid+1, end, idx, val);
+            }
+            seg[node] = min(seg[2*node] , seg[2*node+1]); // Internal node will have the sum of both of its children
+        }
+    }
+    int query(int node, int start, int end, int l, int r){
+        if(r < start or end < l) { // range represented by a node is completely outside the given range
+            return inf;
+        }
+        if(l <= start and end <= r) { // range represented by a node is completely inside the given range
+            return seg[node];
+        }
+        // range represented by a node is partially inside and partially outside the given range
+        int mid = (start + end) / 2;
+        return min(query(2*node, start, mid, l, r), query(2*node+1, mid+1, end, l, r));
     }
 };
+
 
 void solve()
 {
     int n,q;
     cin>>n>>q;
-    if(n>10) return;
     vint v(n);
     f(i,0,n) cin>>v[i];
-    FenwickTree* bit=new FenwickTree(v);
+    SegmentTree* st=new SegmentTree(v);
     while(q--) {
-        // trace(n,q,bit->bit,v);
         int type;
         cin>>type;
-        if(type==1) {
-            int r;
-            cin>>r;
-            cout<<v[r]<<endl;
-            bit->add(r,-v[r]);
-            v[r]=0;
-        }
-        else if(type==2) { // update 
-            int r, delta;
-            cin>>r>>delta;
-            bit->add(r,delta);
-            v[r]+=delta;
+        if(type==1) { // update
+            int k,u;
+            cin>>k>>u;
+            st->update(1,0,n-1,k-1,u-v[k-1]);
+            v[k-1]=u;
         }
         else { // querry
-            int l, r;
-            cin>>l>>r;
-            cout<<bit->sum(l,r)<<endl;
+            int a,b;
+            cin>>a>>b;
+            cout<<st->query(1,0,n-1,a-1,b-1)<<endl;
         }
+        // trace(v,st->seg); 
     }
-
 }
 
  
@@ -132,10 +146,9 @@ signed main()
 {
     ios::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL);
     T = 1;
-    cin >> T;
+    // cin >> T;
     for(int rr = 1; rr <= T; rr++)
     {
-        cout<<"Case "<<rr<<":"<<endl;
         solve();
     }
 }
