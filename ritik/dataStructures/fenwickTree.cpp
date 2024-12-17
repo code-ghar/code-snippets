@@ -61,81 +61,72 @@ int T = 1;
     #define Trace(...)
     #define debug
 #endif
-
+ 
 class FenwickTree {
-    public:
-    vector<int> bit;
     int n;
-
-    FenwickTree(vector<int> &a) {
-        n=a.size();
-        bit=vector<int>(n);
-        for(int i=0; i<a.size(); i++) {
-            add(i, a[i]);
+    vector<int> tree;
+    public:
+ 
+    FenwickTree(vector<int> v) {
+        n=v.size();
+        tree=vector<int>(n+1);
+        for(int i=0; i<n; i++) {
+            add(i+1, v[i]);
         }
     }
-    int sum(int r) {
-        int res=0;
-        while(r>=0) {
-            res+=bit[r];
-            r=(r&(r+1))-1;
-        } 
-        return res;
-    }
-    int sum(int l, int r){
-        return(sum(r)-sum(l-1));
-    }
-    void add(int r, int delta) {
-        while(r<n) {
-            bit[r]+=delta;
-            r=r|(r+1);
+    void add(int k, int x) {
+        while(k<=n) {
+            tree[k]+=x;
+            k += k&-k;
         }
+    }
+ 
+    int sum(int k) {
+        int s=0;
+        while(k>=1) {
+            s+=tree[k];
+            k -= k&-k;
+        }
+        return s;
     }
 };
-
+ 
+ 
 void solve()
 {
     int n,q;
     cin>>n>>q;
-    if(n>10) return;
-    vint v(n);
-    f(i,0,n) cin>>v[i];
-    FenwickTree* bit=new FenwickTree(v);
+    vector<int> v(n);
+    for(int i=0; i<n; i++) {
+        cin>>v[i];
+    }
+    FenwickTree ft(v);
+ 
     while(q--) {
-        // trace(n,q,bit->bit,v);
         int type;
         cin>>type;
         if(type==1) {
-            int r;
-            cin>>r;
-            cout<<v[r]<<endl;
-            bit->add(r,-v[r]);
-            v[r]=0;
+            int k,u;
+            cin>>k>>u;
+            ft.add(k,u-v[k-1]);
+            v[k-1]=u;
         }
-        else if(type==2) { // update 
-            int r, delta;
-            cin>>r>>delta;
-            bit->add(r,delta);
-            v[r]+=delta;
-        }
-        else { // querry
-            int l, r;
-            cin>>l>>r;
-            cout<<bit->sum(l,r)<<endl;
+        else {
+            int a,b;
+            cin>>a>>b;
+            cout<<ft.sum(b)-ft.sum(a-1)<<endl;
         }
     }
-
 }
-
+ 
  
 signed main()
 {
     ios::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL);
     T = 1;
-    cin >> T;
+    // cin >> T;
     for(int rr = 1; rr <= T; rr++)
     {
-        cout<<"Case "<<rr<<":"<<endl;
         solve();
     }
 }

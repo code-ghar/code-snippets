@@ -61,69 +61,87 @@ int T = 1;
     #define Trace(...)
     #define debug
 #endif
- 
-class SegmentTree {
-    int n;
-    vector<int> tree;
+
+class TrieNode {
     public:
- 
-    SegmentTree(const vector<int> &v) {
-        n=1;
-        int m = v.size();
-        while(n<m) n*=2;
-        tree=vector<int>(2*n);
-        for(int i=0; i<m; i++) {
-            add(i,v[i]);
-        }
+    int passes=0;
+    int terminations=0;
+    TrieNode *childs[26];
+};
+
+class Trie{
+    public:
+    int nodes;
+    TrieNode *root;
+    Trie(){
+        root = new TrieNode();
+        nodes=1;
     }
- 
-    void add(int k, int x) {
-        k+=n;
-        tree[k]+=x;
-        for(k/=2; k>=1; k/=2) {
-            tree[k]=tree[2*k]+tree[2*k+1];
+
+    void insert(const string &word){
+        TrieNode *node=root;
+        node->passes++;
+        for(auto c:word){
+            if(!node->childs[c-'a']) {
+                node->childs[c-'a']=new TrieNode();
+                nodes++;
+            }
+            node=node->childs[c-'a'];
+            node->passes++;
         }
+        node->terminations++;
     }
- 
-    int query(int a, int b) {
-        a+=n, b+=n;
-        int sum=0;
-        while(a<=b){
-            if(a%2==1) sum+=tree[a], a++;
-            if(b%2==0) sum+=tree[b], b--;
-            a/=2, b/=2;
+
+    int countWordsEqualTo(const string &word){
+        TrieNode *node=root;
+        for(auto c:word){
+            if(!node->childs[c-'a']) return 0;
+            node=node->childs[c-'a'];
         }
-        return sum;
+        return node->terminations;
+    }
+
+    int countWordsStartingWith(const string &word){
+        TrieNode *node=root;
+        for(auto c:word){
+            if(!node->childs[c-'a']) return 0;
+            node=node->childs[c-'a'];
+        }
+        return node->passes;
+    }
+
+    void erase(const string &word){
+        int occurances=countWordsEqualTo(word);
+        if(occurances==0) return;
+        TrieNode *node=root;
+        for(auto c:word) {
+            node->passes--;
+            TrieNode *next = node->childs[c-'a'];
+            if(node->passes==0) delete(node), nodes--;
+            node=next;
+        }
+        node->passes--;
+        node->terminations--;
+        if(node->passes==0) delete(node), nodes--;
+        if(nodes==0) {
+            root=new TrieNode(), nodes++;
+        }
     }
 };
- 
- 
+
 void solve()
 {
-    int n,q;
-    cin>>n>>q;
-    vector<int> v(n);
-    for(int i=0; i<n; i++) {
-        cin>>v[i];
-    }
-    SegmentTree st(v);
-    while(q--) {
-        int type;
-        cin>>type;
-        if(type==1) {
-            int k,u;
-            cin>>k>>u;
-            st.add(k-1,u-v[k-1]);
-            v[k-1]=u;
-        }
-        else {
-            int a,b;
-            cin>>a>>b;
-            cout<<st.query(a-1, b-1)<<endl;
-        }
-    }
+    Trie trie;
+    string word = "ritik";
+    string prefix="rit";
+    trie.insert(word);
+    cout<<trie.countWordsEqualTo(word)<<endl;
+    cout<<trie.countWordsStartingWith(prefix)<<endl;
+    trie.erase(word);
+    cout<<trie.countWordsEqualTo(word)<<endl;
+    cout<<trie.countWordsStartingWith(prefix)<<endl;
 }
- 
+
  
 signed main()
 {
