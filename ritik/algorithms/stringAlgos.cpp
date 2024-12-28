@@ -61,69 +61,89 @@ int T = 1;
     #define Trace(...)
     #define debug
 #endif
- 
-class SegmentTree {
-    int n;
-    vector<int> tree;
-    public:
- 
-    SegmentTree(const vector<int> &v) {
-        n=1;
-        int m = v.size();
-        while(n<m) n*=2;
-        tree=vector<int>(2*n);
-        for(int i=0; i<m; i++) {
-            add(i,v[i]);
+
+vector<int> rabin_karp(string const& s, string const& t) {
+    const int p = 31; 
+    const int m = 1e9 + 9;
+    int S = s.size(), T = t.size();
+
+    vector<long long> p_pow(max(S, T)); 
+    p_pow[0] = 1; 
+    for (int i = 1; i < (int)p_pow.size(); i++) 
+        p_pow[i] = (p_pow[i-1] * p) % m;
+
+    vector<long long> h(T + 1, 0); 
+    for (int i = 0; i < T; i++)
+        h[i+1] = (h[i] + (t[i] - 'a' + 1) * p_pow[i]) % m; 
+    long long h_s = 0; 
+    for (int i = 0; i < S; i++) 
+        h_s = (h_s + (s[i] - 'a' + 1) * p_pow[i]) % m; 
+
+    vector<int> occurrences;
+    for (int i = 0; i + S - 1 < T; i++) {
+        long long cur_h = (h[i+S] + m - h[i]) % m;
+        if (cur_h == h_s * p_pow[i] % m)
+            occurrences.push_back(i);
+    }
+    return occurrences;
+}
+
+
+vector<int> z_function(string s) {
+    int n = s.size();
+    vector<int> z(n);
+    int l = 0, r = 0;
+    for(int i = 1; i < n; i++) {
+        if(i < r) {
+            z[i] = min(r - i, z[i - l]);
+        }
+        while(i + z[i] < n && s[z[i]] == s[i + z[i]]) {
+            z[i]++;
+        }
+        if(i + z[i] > r) {
+            l = i;
+            r = i + z[i];
         }
     }
- 
-    void add(int k, int x) {
-        k+=n;
-        tree[k]+=x;
-        for(k/=2; k>=1; k/=2) {
-            tree[k]=tree[2*k]+tree[2*k+1];
+    return z;
+}
+
+vector<int> prefix_function(string s) {
+    int n = (int)s.length();
+    vector<int> pi(n);
+    for (int i = 1; i < n; i++) {
+        int j = pi[i-1];
+        while (j > 0 && s[i] != s[j])
+            j = pi[j-1];
+        if (s[i] == s[j])
+            j++;
+        pi[i] = j;
+    }
+    return pi;
+}
+
+vector<int> manacher_odd(string s) {
+    int n = s.size();
+    s = "$" + s + "^";
+    vector<int> p(n + 2);
+    int l = 1, r = 1;
+    for(int i = 1; i <= n; i++) {
+        p[i] = max((int)0, min(r - i, p[l + (r - i)]));
+        while(s[i - p[i]] == s[i + p[i]]) {
+            p[i]++;
+        }
+        if(i + p[i] > r) {
+            l = i - p[i], r = i + p[i];
         }
     }
- 
-    int query(int a, int b) {
-        a+=n, b+=n;
-        int sum=INT_MAX;
-        while(a<=b){
-            if(a%2==1) sum=min(sum,tree[a]), a++;
-            if(b%2==0) sum=min(sum,tree[b]), b--;
-            a/=2, b/=2;
-        }
-        return sum;
-    }
-};
- 
- 
+    return vector<int>(begin(p) + 1, end(p) - 1);
+}
+
 void solve()
 {
-    int n,q;
-    cin>>n>>q;
-    vector<int> v(n);
-    for(int i=0; i<n; i++) {
-        cin>>v[i];
-    }
-    SegmentTree st(v);
-    while(q--) {
-        int type;
-        cin>>type;
-        if(type==1) {
-            int k,u;
-            cin>>k>>u;
-            st.add(k-1,u-v[k-1]);
-            v[k-1]=u;
-        }
-        else {
-            int a,b;
-            cin>>a>>b;
-            cout<<st.query(a-1, b-1)<<endl;
-        }
-    }
+
 }
- 
+
  
 signed main()
 {
