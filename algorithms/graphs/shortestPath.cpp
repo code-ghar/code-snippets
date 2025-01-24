@@ -63,6 +63,95 @@ int T = 1;
 #endif
 
 
+void floydWarshall(vector<vector<int>> &matrix){ // any src,dest shortest path
+    int V=matrix.size();
+    for(int k=0; k<V; k++) {
+        for(int i=0; i<V; i++) {
+            for(int j=0; j<V; j++) {
+                if(i==j) matrix[i][j]=0;
+                if(matrix[i][k]==-1 || matrix[k][j]==-1) continue;
+                if(matrix[i][j]==-1) matrix[i][j]=matrix[i][k]+matrix[k][j];
+                else matrix[i][j]=min(matrix[i][j],matrix[i][k]+matrix[k][j]);
+            }
+        }
+    }
+}
+
+
+class BellmanFord {
+public:
+    int V, E, src; // number of nodes, edges and starting node
+    vector<vector<int>> edges; // {from, to, weight}
+    const int INF = 100000000;
+    
+    BellmanFord(int V, vector<vector<int>> &edges) {
+        this->V=V;
+        this->edges=edges;
+        this->E=edges.size();
+    }
+    
+    vector<int> singleSourceShortestPath(int src, vector<int> & d, vector<int> & par) {
+        d = vector<int>(V, INF);
+        par = vector<int>(V, -1);
+        d[src] = 0;
+        int cycleReach=-1;
+        
+        for (int i = 0; i < V; i++){
+            cycleReach=-1;
+            for (auto e : edges){
+                int node=e[0], child=e[1], weight=e[2]; 
+                if (d[node] < INF && (d[child] > d[node] + weight)){
+                    d[child] = d[node] + weight;
+                    par[child] = node;
+                    cycleReach = child;
+                }
+            }
+        }
+        if(cycleReach != -1) { // negative cycle detected
+            d.clear(); 
+        }
+        return d;
+    }
+};
+
+
+class Dijkstra {
+    const int INF = 1000000000;
+    vector<vector<pair<int, int>>> adj;
+
+    void dijkstra(int s, vector<int> & d, vector<int> & par) {
+        int n = adj.size();
+        d.assign(n, INF);
+        par.assign(n, -1);
+
+        d[s] = 0;
+        using pii = pair<int, int>;
+        priority_queue<pii, vector<pii>, greater<pii>> q;
+        q.push({0, s});
+        while (!q.empty()) {
+            int v = q.top().second;
+            int d_v = q.top().first;
+            q.pop();
+            if (d_v != d[v])
+                continue;
+
+            for (auto edge : adj[v]) {
+                int to = edge.first;
+                int len = edge.second;
+
+                if (d[v] + len < d[to]) {
+                    d[to] = d[v] + len;
+                    par[to] = v;
+                    q.push({d[to], to});
+                }
+            }
+        }
+    }
+};
+
+
+
+
 void solve()
 {
 
