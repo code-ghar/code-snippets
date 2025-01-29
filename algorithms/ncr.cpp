@@ -62,6 +62,7 @@ int T = 1;
     #define debug
 #endif
 
+
 int nCr(int n, int r) {
     int x=n-r,y=0,z=1;
     while(y<r) {
@@ -70,23 +71,59 @@ int nCr(int n, int r) {
     }
     return z;
 }
+int pow(int a, int b){
+    int res=1;
+    while(b>0){
+        if(b&1) res=res*a;
+        b=b>>1;
+        a=a*a;
+    }
+    return res;
+}
+int powModP(int a, int b, int p){
+    int res=1;
+    while(b>0){
+        if(b&1) res=(res*a)%p;
+        b=b>>1;
+        a=(a*a)%p;
+    }
+    return res;
+}
+int invModP(int a, int p){
+    if(a==0) return inff;
+    return powModP(a, p-2, p);
+}
+vector<int> fact, factInvModP;
 
-void solve()
-{
+void precomputeFactandInvFact(int N, int p) {
+    fact = factInvModP = vector<int>(N+1);
+    fact[0]=fact[1]=1;
+    for(int i=2; i<=N; i++) fact[i]*=fact[i-1];
+    factInvModP[N]=invModP(fact[N], p);
+    for(int i=N-1; i>1; i--) {
+        factInvModP[i]=(factInvModP[i+1]*(i+1))%p;
+    }   
+}
+int nCrModP(int n, int r, int p){
+    if(n<r) return 0;
+    if(r==0) return 1;
+    return ((fact[n]*factInvModP[r])%p*factInvModP[n-r])%p;
+}
+void precompute() {
+    precomputeFactandInvFact(maxN, mod);
+}
 
-    int n,r;
-    cin>>n>>r;
-    cout<<"ncr is : "<<nCr(n,r)<<endl;
+void solve() {
+    
 }
 
  
-signed main()
-{
+signed main() {
     ios::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL);
     T = 1;
     // cin >> T;
-    for(int rr = 1; rr <= T; rr++)
-    {
+    // precompute();
+    for(int rr = 1; rr <= T; rr++) {
         solve();
     }
 }

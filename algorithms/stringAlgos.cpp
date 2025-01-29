@@ -64,7 +64,7 @@ int T = 1;
 
 vector<int> rabin_karp(string const& s, string const& t) {
     const int p = 31; 
-    const int m = 1e9 + 9;
+    const int m = 1e9 + 7;
     int S = s.size(), T = t.size();
 
     vector<long long> p_pow(max(S, T)); 
@@ -147,6 +147,7 @@ vector<int> manacher(string s) {
     auto res = manacher_odd(t + "#");
     return vector<int>(begin(res) + 1, end(res) - 1);
 }
+
 
 void solve()
 {

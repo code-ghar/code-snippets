@@ -68,8 +68,8 @@ class SegmentTree {
     public:
  
     SegmentTree(const vector<int> &v) {
-        n=1;
         int m = v.size();
+        n=1;
         while(n<m) n*=2;
         tree=vector<int>(2*n);
         for(int i=0; i<m; i++) {

@@ -67,9 +67,9 @@ class FenwickTree {
     vector<int> tree;
     public:
  
-    FenwickTree(vector<int> v) {
+    FenwickTree(vector<int> &v) {
         n=v.size();
-        tree=vector<int>(n+1);
+        tree=vector<int>(n+1); // here its 1 based indexing
         for(int i=0; i<n; i++) {
             add(i+1, v[i]);
         }

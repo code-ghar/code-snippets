@@ -69,11 +69,15 @@ public:
     int currPos;
 
     // map<int,int> valueOpenIntervals (any BST can be used) if map remove manually
+    // priority_queue<int> (max or min) can also be used, 
+    // but expiry cant be manually done at time of expiry
     multiset<int> valueOpenIntervals;
     
     
     // map<int, vector<int>> expiry;
     // multiset<pair<int,int>> expiry; {expiryDate, valueInOpenIntervals}
+    // expiry is not always needed we can pop expired element,
+    // while fetching our arranged elements
     vector<vector<int>> expiry;
     
     Sweep(int expirySize) {
