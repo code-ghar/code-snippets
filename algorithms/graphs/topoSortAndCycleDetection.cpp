@@ -83,18 +83,6 @@ vector<int> topoSortCycleDetectionDfs(vector<vector<int>> &adj){
         if(!vis[i]) cyclic|=dfs(i, topo, adj, vis);
     }
     reverse(topo.begin(), topo.end());
-    // return cyclic;
-    return topo;
-}
-
-vector<int> topoSortCycleDetectionDfs(vector<vector<int>> &adj){
-    int n=adj.size();
-    vector<int> vis(n), topo;
-    bool cyclic=false;
-    for(int i=0; i<n; i++){
-        if(!vis[i]) cyclic|=dfs(i, topo, adj, vis);
-    }
-    reverse(topo.begin(), topo.end());
     // return cyclic
     return topo;
 }
