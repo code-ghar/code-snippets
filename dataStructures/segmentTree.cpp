@@ -1,5 +1,28 @@
 //RITIK RAI
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <cstdio>
+#include <map>
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <deque>
+#include <bitset>
+#include <limits>
+#include <numeric>
+#include <sstream>
+#include <fstream>
+#include <iomanip>
+#include <tuple>
+#include <chrono>    
+#include <random>
+
 using namespace std;
 #define uint            unsigned long long int // uint64_t
 #define ll              long long int
@@ -76,8 +99,9 @@ class SegmentTree {
             add(i,v[i]);
         }
     }
- 
-    void add(int k, int x) {
+    
+    // zero index
+    void add(int k, int x) { 
         k+=n;
         tree[k]+=x;
         for(k/=2; k>=1; k/=2) {
