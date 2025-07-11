@@ -97,9 +97,9 @@ class FenwickTree {
             add(i+1, v[i]);
         }
     }
-    void add(int k, int x) {
+    void add(int k, int delta) {
         while(k<=n) {
-            tree[k]+=x;
+            tree[k]+=delta;
             k += k&-k;
         }
     }
